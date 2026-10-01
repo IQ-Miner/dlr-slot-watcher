@@ -1008,9 +1008,11 @@ function main(array $argv): int
         }
     }
 
-    // Morgenbericht: einmal am Tag, beim ersten Lauf ab REPORT_HOUR.
+    // Morgenbericht: einmal am Tag, beim ersten Lauf ab REPORT_HOUR. Mit 'bericht' => false
+    // in config.php bleibt er aus, etwa wenn ein eigenes Tagesbriefing den Verlauf auswertet.
     $reportHour = (int) ($config['bericht_stunde'] ?? REPORT_HOUR);
-    if ((int) $berlinNow->format('G') >= $reportHour && $journal['bericht']['datum'] !== $berlinNow->format('Y-m-d')) {
+    $reportOn = ($config['bericht'] ?? true) !== false;
+    if ($reportOn && (int) $berlinNow->format('G') >= $reportHour && $journal['bericht']['datum'] !== $berlinNow->format('Y-m-d')) {
         try {
             notify(
                 $topic,
