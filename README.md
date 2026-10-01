@@ -92,6 +92,24 @@ gh workflow enable watcher.yml
 - **Wenn die Push-Nachricht nicht zugestellt werden kann**, schlägt der Lauf fehl und GitHub schreibt dir eine E-Mail. Der Stand wird dann nicht gespeichert, der nächste Lauf meldet die Änderung erneut.
 - **Wenn ein Problem dauerhaft gemeldet wird**, wurde die Seite vermutlich umgebaut. Dann muss `watcher.py` angepasst werden.
 
+## Variante für den eigenen Webspace
+
+Der Zeitplan von GitHub ist nicht pünktlich. Wer einen Webspace mit Cronjobs und PHP hat, kann den Watcher dort minutengenau laufen lassen. Im Ordner `hostinger/` liegt dafür dieselbe Logik als PHP-Skript.
+
+1. `hostinger/watcher.php` und `hostinger/.htaccess` in einen eigenen Ordner auf dem Webspace legen. Die `.htaccess` sperrt den Ordner für Aufrufe aus dem Browser.
+2. `hostinger/config.example.php` als `config.php` daneben ablegen und das eigene Topic eintragen. `config.php` gehört nicht ins Repo.
+3. Einen Cronjob anlegen, zum Beispiel alle 5 Minuten:
+
+```
+2-59/5 * * * * /usr/bin/php /pfad/zum/ordner/watcher.php
+```
+
+Das Skript legt im selben Ordner `state.json` und `watcher.log` an. Im Log steht eine Zeile pro Lauf.
+
+Eine Testnachricht schickt `php watcher.php --test`, ein Probelauf ohne Versand ist `php watcher.php --dry-run`.
+
+Laufen beide Varianten gleichzeitig, führt jede ihren eigenen Stand. Ein freier Termin wird dann zweimal gemeldet.
+
 ## Lokal ausführen
 
 ```bash
