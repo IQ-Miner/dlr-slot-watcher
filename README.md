@@ -104,7 +104,13 @@ Der Zeitplan von GitHub ist nicht pünktlich. Wer einen Webspace mit Cronjobs un
 2-59/5 * * * * /usr/bin/php /pfad/zum/ordner/watcher.php
 ```
 
-Das Skript legt im selben Ordner `state.json` und `watcher.log` an. Im Log steht eine Zeile pro Lauf.
+Das Skript legt im selben Ordner `state.json`, `verlauf.json` und `watcher.log` an. Im Log steht eine Zeile pro Lauf.
+
+### Morgenbericht
+
+Die PHP-Variante schickt einmal am Tag eine Zusammenfassung: was sich seit dem letzten Bericht geändert hat, der aktuelle Stand und wie oft geprüft wurde. Sie kommt mit dem ersten Lauf ab 8 Uhr (Europe/Berlin), die Stunde lässt sich in `config.php` mit `bericht_stunde` ändern. Bleibt der Bericht aus, läuft der Cronjob nicht mehr.
+
+In `verlauf.json` steht, wann der letzte Lauf war und was sich wann geändert hat, auch Dinge ohne eigene Push-Nachricht wie "wieder ausverkauft" oder "Termin entfallen". Eine eigene Übersichtsseite kann die Datei lesen. Mit `bericht_link` in `config.php` öffnet der Bericht beim Antippen diese Seite statt der Buchungsseite.
 
 Eine Testnachricht schickt `php watcher.php --test`, ein Probelauf ohne Versand ist `php watcher.php --dry-run`.
 

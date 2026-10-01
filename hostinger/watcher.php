@@ -9,6 +9,10 @@
  * Aufruf:  php watcher.php [--dry-run] [--test] [--state=PFAD]
  * Das ntfy-Topic steht in config.php (siehe config.example.php) oder in der
  * Umgebungsvariable NTFY_TOPIC.
+ *
+ * Neben state.json (letzter Stand) schreibt das Skript verlauf.json: wann der
+ * letzte Lauf war und was sich wann geändert hat. Daraus entsteht einmal am
+ * Tag der Morgenbericht, und eine eigene Übersichtsseite kann die Datei lesen.
  */
 
 declare(strict_types=1);
@@ -31,6 +35,8 @@ const MAX_DAY_REQUESTS = 12;     // Obergrenze für Tagesansichten pro Lauf
 const ERROR_COOLDOWN = 6 * 3600; // Sekunden
 const MAX_LINES = 12;            // Zeilen pro Push-Nachricht
 const LOG_MAX_BYTES = 262144;
+const JOURNAL_MAX = 300;          // so viele Ereignisse bleiben in verlauf.json
+const REPORT_HOUR = 8;            // Morgenbericht ab dieser Stunde (Europe/Berlin)
 
 const AUSVERKAUFT = 'ausverkauft';
 const BUCHBAR = 'buchbar';
@@ -593,7 +599,7 @@ function compare(array $old, array $new): array
 // Benachrichtigung und Status
 // --------------------------------------------------------------------------- //
 
-function notify(string $topic, string $title, array $lines, int $priority, bool $dryRun): void
+function notify(string $topic, string $title, array $lines, int $priority, bool $dryRun, string $click = PAGE_URL): void
 {
     $shown = array_slice($lines, 0, MAX_LINES);
     if (count($lines) > MAX_LINES) {
@@ -613,7 +619,7 @@ function notify(string $topic, string $title, array $lines, int $priority, bool 
         'title' => $title,
         'message' => implode("\n", $shown),
         'priority' => $priority,
-        'click' => PAGE_URL,
+        'click' => $click,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     $server = rtrim(getenv('NTFY_SERVER') ?: 'https://ntfy.sh', '/');
     $error = 'unbekannter Fehler';
@@ -732,20 +738,140 @@ function write_log(string $dir, string $line): void
     file_put_contents($path, gmdate('Y-m-d H:i:s') . ' UTC  ' . $line . "\n", FILE_APPEND);
 }
 
-function read_topic(): string
+function read_config(): array
+{
+    $file = __DIR__ . '/config.php';
+    $config = is_file($file) ? require $file : [];
+    return is_array($config) ? $config : [];
+}
+
+function read_topic(array $config): string
 {
     $topic = getenv('NTFY_TOPIC');
     if (is_string($topic) && trim($topic) !== '') {
         return trim($topic);
     }
-    $file = __DIR__ . '/config.php';
-    if (is_file($file)) {
-        $config = require $file;
-        if (is_array($config) && isset($config['ntfy_topic'])) {
-            return trim((string) $config['ntfy_topic']);
+    return trim((string) ($config['ntfy_topic'] ?? ''));
+}
+
+// --------------------------------------------------------------------------- //
+// Verlauf und Morgenbericht
+// --------------------------------------------------------------------------- //
+
+/** Änderungen ohne Push: wieder ausverkauft oder entfallen. Nur für den Verlauf. */
+function quiet_changes(array $old, array $new, string $todayIso): array
+{
+    $events = [];
+    foreach ($old['angebote'] ?? [] as $offerId => $offer) {
+        $now = $new['angebote'][$offerId] ?? null;
+        if ($now === null) {
+            $events[] = ['entfallen', 'Angebot entfernt: ' . $offer['titel']];
+        } elseif ($offer['status'] === BUCHBAR && $now['status'] !== BUCHBAR) {
+            $events[] = ['ausverkauft', 'Wieder ausverkauft: Angebot ' . $offer['titel']];
         }
     }
-    return '';
+    if (!isset($new['tage'])) {
+        return $events;
+    }
+    $oldDays = $old['tage'] ?? [];
+    ksort($oldDays, SORT_STRING);
+    foreach ($oldDays as $day => $info) {
+        $day = (string) $day;
+        if ($day < $todayIso) {
+            continue; // vergangene Tage fallen still heraus
+        }
+        $now = $new['tage'][$day] ?? null;
+        $slots = sort_by_start($info['termine'] ?? []);
+        if ($now === null) {
+            if (!$slots) {
+                $events[] = ['entfallen', 'Termin entfallen: ' . fmt_day($day)];
+            }
+            foreach ($slots as $slot) {
+                $events[] = ['entfallen', 'Termin entfallen: ' . slot_line($slot)];
+            }
+            continue;
+        }
+        if (!array_key_exists('termine', $now)) {
+            continue;
+        }
+        foreach ($slots as $slotId => $slot) {
+            $after = $now['termine'][$slotId] ?? null;
+            if ($after === null) {
+                $events[] = ['entfallen', 'Termin entfallen: ' . slot_line($slot)];
+            } elseif ($slot['status'] === BUCHBAR && $after['status'] !== BUCHBAR) {
+                $events[] = ['ausverkauft', 'Wieder ausverkauft: ' . slot_line($slot)];
+            }
+        }
+    }
+    return $events;
+}
+
+function load_journal(string $path): array
+{
+    $journal = is_file($path) ? json_decode((string) file_get_contents($path), true) : null;
+    $journal = is_array($journal) ? $journal : [];
+    $journal['ereignisse'] = array_values(array_filter($journal['ereignisse'] ?? [], 'is_array'));
+    $journal['bericht'] = ($journal['bericht'] ?? []) + ['datum' => '', 'seit' => '', 'laeufe' => 0, 'probleme' => 0];
+    return $journal;
+}
+
+function save_journal(string $path, array $journal): void
+{
+    $journal['ereignisse'] = array_slice($journal['ereignisse'], -JOURNAL_MAX);
+    $flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+    $tmp = $path . '.tmp';
+    if (file_put_contents($tmp, json_encode($journal, $flags) . "\n") !== false) {
+        rename($tmp, $path);
+    }
+}
+
+function greeting(DateTimeImmutable $berlin, string $name): string
+{
+    $hour = (int) $berlin->format('G');
+    $text = $hour < 11 ? 'Guten Morgen' : ($hour < 18 ? 'Hallo' : 'Guten Abend');
+    return $name !== '' ? "$text, $name" : $text;
+}
+
+function stand_line(array $state): string
+{
+    $offers = $state['angebote'] ?? [];
+    $days = $state['tage'] ?? [];
+    $isFree = function ($x) {
+        return ($x['status'] ?? '') === BUCHBAR;
+    };
+    $freeOffers = count(array_filter($offers, $isFree));
+    $freeDays = count(array_filter($days, $isFree));
+    if ($freeOffers === 0 && $freeDays === 0) {
+        return 'Stand: ' . count($offers) . ' Angebote, ' . count($days) . ' Tage mit Terminen, alles ausverkauft.';
+    }
+    return 'Stand: ' . $freeOffers . ' von ' . count($offers) . ' Angeboten buchbar, '
+        . $freeDays . ' von ' . count($days) . ' Tagen buchbar.';
+}
+
+/** Textzeilen für den Morgenbericht: was seit dem letzten Bericht passiert ist. */
+function report_lines(array $state, array $journal): array
+{
+    $report = $journal['bericht'];
+    $berlin = new DateTimeZone('Europe/Berlin');
+    $since = $report['seit'] !== '' ? strtotime($report['seit']) : 0;
+    $events = array_values(array_filter($journal['ereignisse'], function ($e) use ($since) {
+        return strtotime((string) ($e['zeit'] ?? '')) > $since;
+    }));
+    $span = $report['datum'] !== '' ? 'seit gestern' : 'seit dem Start';
+    $lines = [];
+    if (!$events) {
+        $lines[] = "DLR-Termine: keine Änderung $span.";
+    } else {
+        $lines[] = 'DLR-Termine: ' . count($events) . (count($events) === 1 ? ' Neuigkeit ' : ' Neuigkeiten ') . $span . ':';
+        foreach (array_slice($events, -8) as $event) {
+            $when = (new DateTimeImmutable((string) $event['zeit']))->setTimezone($berlin);
+            $lines[] = WOCHENTAGE[(int) $when->format('N')] . ' ' . $when->format('H:i') . ' ' . $event['text'];
+        }
+    }
+    $lines[] = stand_line($state);
+    $lines[] = 'Geprüft: ' . $report['laeufe'] . ' mal, '
+        . ($report['probleme'] > 0 ? 'davon ' . $report['probleme'] . ' mal mit Problem.' : 'ohne Problem.');
+    return $lines;
 }
 
 function main(array $argv): int
@@ -759,7 +885,8 @@ function main(array $argv): int
         }
     }
 
-    $topic = read_topic();
+    $config = read_config();
+    $topic = read_topic($config);
     if ($topic === '' && !$dryRun) {
         out('FEHLER: Kein ntfy-Topic gesetzt (config.php oder NTFY_TOPIC).');
         return 2;
@@ -825,6 +952,16 @@ function main(array $argv): int
 
     $summary = count($new['angebote'] ?? []) . ' Angebote, ' . count($new['tage'] ?? []) . ' Tage';
     $logDir = dirname($statePath);
+    $journalPath = $logDir . '/verlauf.json';
+    $journal = load_journal($journalPath);
+    $stamp = gmdate('Y-m-d\TH:i:s+00:00', $now);
+    $berlinNow = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
+    $journal['letzter_lauf'] = $stamp;
+    $journal['letzter_lauf_ok'] = !$problems;
+    $journal['bericht']['laeufe']++;
+    if ($problems) {
+        $journal['bericht']['probleme']++;
+    }
 
     try {
         if ($free) {
@@ -837,7 +974,19 @@ function main(array $argv): int
         // Stand nicht speichern, damit der nächste Lauf die Änderung erneut meldet.
         out('FEHLER: Push nicht zugestellt (' . $e->getMessage() . '). Stand bleibt unverändert.');
         write_log($logDir, 'FEHLER Push nicht zugestellt: ' . $e->getMessage());
+        $journal['letzter_lauf_ok'] = false;
+        save_journal($journalPath, $journal);
         return 1;
+    }
+
+    foreach ($free as $line) {
+        $journal['ereignisse'][] = ['zeit' => $stamp, 'art' => 'frei', 'text' => $line];
+    }
+    foreach ($fresh as $line) {
+        $journal['ereignisse'][] = ['zeit' => $stamp, 'art' => 'neu', 'text' => $line];
+    }
+    foreach (quiet_changes($old, $new, $berlinNow->format('Y-m-d')) as [$kind, $line]) {
+        $journal['ereignisse'][] = ['zeit' => $stamp, 'art' => $kind, 'text' => $line];
     }
 
     $exitCode = 0;
@@ -848,7 +997,8 @@ function main(array $argv): int
         if (error_due($old, $now)) {
             try {
                 notify($topic, 'DLR-Watcher: Problem', $problems, PRIO_DEFAULT, $dryRun);
-                $new['fehler'] = ['letzte_meldung' => gmdate('Y-m-d\TH:i:s+00:00', $now)];
+                $new['fehler'] = ['letzte_meldung' => $stamp];
+                $journal['ereignisse'][] = ['zeit' => $stamp, 'art' => 'problem', 'text' => 'Problem: ' . implode('; ', $problems)];
             } catch (NotifyError $e) {
                 out('FEHLER: Fehlermeldung nicht zugestellt (' . $e->getMessage() . ')');
                 $exitCode = 1;
@@ -858,7 +1008,26 @@ function main(array $argv): int
         }
     }
 
+    // Morgenbericht: einmal am Tag, beim ersten Lauf ab REPORT_HOUR.
+    $reportHour = (int) ($config['bericht_stunde'] ?? REPORT_HOUR);
+    if ((int) $berlinNow->format('G') >= $reportHour && $journal['bericht']['datum'] !== $berlinNow->format('Y-m-d')) {
+        try {
+            notify(
+                $topic,
+                greeting($berlinNow, trim((string) ($config['name'] ?? ''))),
+                report_lines($new, $journal),
+                PRIO_DEFAULT,
+                $dryRun,
+                (string) ($config['bericht_link'] ?? PAGE_URL)
+            );
+            $journal['bericht'] = ['datum' => $berlinNow->format('Y-m-d'), 'seit' => $stamp, 'laeufe' => 0, 'probleme' => 0];
+        } catch (NotifyError $e) {
+            out('WARNUNG: Morgenbericht nicht zugestellt (' . $e->getMessage() . '), neuer Versuch im nächsten Lauf.');
+        }
+    }
+
     out(save_state($statePath, $new) ? 'state.json aktualisiert.' : 'state.json unverändert.');
+    save_journal($journalPath, $journal);
 
     if ($problems) {
         $summary = 'PROBLEM ' . implode('; ', $problems);
