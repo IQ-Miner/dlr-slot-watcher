@@ -1,0 +1,201 @@
+{
+  "angebote": {
+    "31e09ad84f2ba0f4a931847f15235d44": {
+      "button": "Ausverkauft",
+      "naechster_termin": "2026-11-05T08:00:00+01:00",
+      "ort": "Sportallee 54A, 22335 Hamburg, Deutschland",
+      "status": "ausverkauft",
+      "titel": "Appointments for the DLR certificate in Hamburg (german & english)"
+    },
+    "51288a70bea69976c000c6042c478ba9": {
+      "button": "Ausverkauft",
+      "naechster_termin": "2026-11-03T08:30:00+01:00",
+      "ort": "Cherstrasse 1, 8152 Opfikon, Schweiz",
+      "status": "ausverkauft",
+      "titel": "Appointments for the DLR certificate in Zurich, Switzerland (german & english)"
+    },
+    "953b11ef0dce1a9079e1e93896d15578": {
+      "button": "Ausverkauft",
+      "naechster_termin": "2026-10-20T08:00:00+02:00",
+      "ort": "Sportallee 54A, 22335 Hamburg, Deutschland",
+      "status": "ausverkauft",
+      "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+    },
+    "97034de2382a484a59325ad02650c817": {
+      "button": "Ausverkauft",
+      "naechster_termin": "2026-10-19T08:30:00+02:00",
+      "ort": "Cherstrasse 1, 8152 Opfikon, Schweiz",
+      "status": "ausverkauft",
+      "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+    }
+  },
+  "tage": {
+    "2026-10-19": {
+      "status": "ausverkauft",
+      "termine": {
+        "97034de2382a484a59325ad02650c817-2026-10-19-08-30-00": {
+          "angebot": "97034de2382a484a59325ad02650c817",
+          "start": "2026-10-19T08:30:00+02:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+        }
+      }
+    },
+    "2026-10-20": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-10-20-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-10-20T08:00:00+02:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-10-27": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-10-27-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-10-27T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-11-03": {
+      "status": "ausverkauft",
+      "termine": {
+        "51288a70bea69976c000c6042c478ba9-2026-11-03-08-30-00": {
+          "angebot": "51288a70bea69976c000c6042c478ba9",
+          "start": "2026-11-03T08:30:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Appointments for the DLR certificate in Zurich, Switzerland (german & english)"
+        },
+        "953b11ef0dce1a9079e1e93896d15578-2026-11-03-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-11-03T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-11-05": {
+      "status": "ausverkauft",
+      "termine": {
+        "31e09ad84f2ba0f4a931847f15235d44-2026-11-05-08-00-00": {
+          "angebot": "31e09ad84f2ba0f4a931847f15235d44",
+          "start": "2026-11-05T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Appointments for the DLR certificate in Hamburg (german & english)"
+        }
+      }
+    },
+    "2026-11-06": {
+      "status": "ausverkauft",
+      "termine": {
+        "97034de2382a484a59325ad02650c817-2026-11-06-08-30-00": {
+          "angebot": "97034de2382a484a59325ad02650c817",
+          "start": "2026-11-06T08:30:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+        }
+      }
+    },
+    "2026-11-10": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-11-10-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-11-10T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-11-17": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-11-17-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-11-17T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        },
+        "97034de2382a484a59325ad02650c817-2026-11-17-08-30-00": {
+          "angebot": "97034de2382a484a59325ad02650c817",
+          "start": "2026-11-17T08:30:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+        }
+      }
+    },
+    "2026-11-24": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-11-24-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-11-24T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-12-01": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-12-01-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-12-01T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        }
+      }
+    },
+    "2026-12-03": {
+      "status": "ausverkauft",
+      "termine": {
+        "97034de2382a484a59325ad02650c817-2026-12-03-08-30-00": {
+          "angebot": "97034de2382a484a59325ad02650c817",
+          "start": "2026-12-03T08:30:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+        }
+      }
+    },
+    "2026-12-08": {
+      "status": "ausverkauft",
+      "termine": {
+        "953b11ef0dce1a9079e1e93896d15578-2026-12-08-08-00-00": {
+          "angebot": "953b11ef0dce1a9079e1e93896d15578",
+          "start": "2026-12-08T08:00:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
+        },
+        "97034de2382a484a59325ad02650c817-2026-12-08-08-30-00": {
+          "angebot": "97034de2382a484a59325ad02650c817",
+          "start": "2026-12-08T08:30:00+01:00",
+          "status": "ausverkauft",
+          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
+        }
+      }
+    },
+    "2026-12-10": {
+      "status": "ausverkauft"
+    },
+    "2026-12-15": {
+      "status": "ausverkauft"
+    },
+    "2026-12-22": {
+      "status": "ausverkauft"
+    }
+  },
+  "version": 1,
+  "widgets": [
+    {
+      "base": "https://eu5.bookingkit.de",
+      "cw": "8c1c1aeae7ca0f5858830e58e74dbdac",
+      "vendor": "6d81d7b80883101123aa3b5c62b5b749"
+    }
+  ]
+}
