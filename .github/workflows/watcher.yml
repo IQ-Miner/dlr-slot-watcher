@@ -1,0 +1,53 @@
+name: DLR-Slot-Watcher
+
+on:
+  schedule:
+    # Alle 10 Minuten, um 3 Minuten versetzt, weil GitHub zur vollen Stunde
+    # besonders oft Läufe verzögert oder auslässt.
+    - cron: "3-59/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      testmodus:
+        description: "Nur eine Testnachricht an ntfy schicken (keine Prüfung)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dlr-slot-watcher
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Abhängigkeiten installieren
+        run: pip install --quiet -r requirements.txt
+
+      - name: Seite prüfen
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TEST_MODE: ${{ inputs.testmodus || 'false' }}
+        run: python watcher.py
+
+      - name: Stand speichern, falls geändert
+        run: |
+          if [ -z "$(git status --porcelain state.json)" ]; then
+            echo "Keine Änderung, kein Commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git commit -m "Stand aktualisiert"
+          git push || (git pull --rebase && git push)
