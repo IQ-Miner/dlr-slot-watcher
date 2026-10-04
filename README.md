@@ -34,6 +34,24 @@ Die Angebote stehen nicht im HTML der Seite. Die Seite bindet ein Buchungs-Widge
 
 Pro Lauf sind das im Normalfall 6 Abrufe mit einer Sekunde Pause dazwischen, mit normalem Browser-User-Agent, Timeout und höchstens einem zweiten Versuch.
 
+## Für dich selbst einrichten
+
+Du willst auch benachrichtigt werden? So bekommst du deinen eigenen Tracker:
+
+1. **ntfy installieren**: die kostenlose App ntfy für iOS oder Android.
+2. **Eigenes Topic abonnieren**: in der App ein Topic mit einem schwer zu erratenden Namen, zum Beispiel `dlr-name-zufallszeichen`. Wer das Topic kennt, kann deine Nachrichten mitlesen.
+3. **Eigene Kopie auf GitHub**: dieses Repo forken. Nur auf den eigenen Rechner klonen reicht nicht, die Action muss in deinem eigenen GitHub-Repo laufen.
+4. **Topic als Secret hinterlegen**: in deiner Kopie unter **Settings**, **Secrets and variables**, **Actions**, **New repository secret**. Name `NTFY_TOPIC`, Wert ist dein Topic (siehe unten).
+5. **Actions einschalten**: den Reiter **Actions** öffnen und die Workflows aktivieren. In einem Fork schaltet GitHub geplante Workflows zunächst ab.
+6. **Einmal testen**: wie unten unter "Testen" beschrieben. Kommt die Push-Nachricht an, läuft alles.
+
+Gut zu wissen:
+
+- Ein Fork eines öffentlichen Repos ist selbst öffentlich. Dann sind die Minuten für GitHub Actions kostenlos. Ein privates Repo würde bei einem Lauf alle 10 Minuten das kostenlose Monatskontingent schnell aufbrauchen.
+- Bleib fair und stell den Abstand nicht unter 10 Minuten.
+- Nutzt du einen Fokus wie Schlafen oder Nicht stören, nimm ntfy in die erlaubten Apps auf.
+- Geplante Läufe können sich verspäten, und nach 60 Tagen ohne Aktivität pausiert GitHub sie (siehe "Gut zu wissen" weiter unten). Wenn neue Termine freigegeben werden, sei trotzdem selbst bereit.
+
 ## Einrichten
 
 ### 1. ntfy-Topic als Secret setzen
