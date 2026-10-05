@@ -23,24 +23,13 @@
     },
     "97034de2382a484a59325ad02650c817": {
       "button": "Ausverkauft",
-      "naechster_termin": "2026-10-19T08:30:00+02:00",
+      "naechster_termin": "2026-11-06T08:30:00+01:00",
       "ort": "Cherstrasse 1, 8152 Opfikon, Schweiz",
       "status": "ausverkauft",
       "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
     }
   },
   "tage": {
-    "2026-10-19": {
-      "status": "ausverkauft",
-      "termine": {
-        "97034de2382a484a59325ad02650c817-2026-10-19-08-30-00": {
-          "angebot": "97034de2382a484a59325ad02650c817",
-          "start": "2026-10-19T08:30:00+02:00",
-          "status": "ausverkauft",
-          "titel": "Termine DLR Zertifikat in Zürich (Testsprache nur Deutsch)"
-        }
-      }
-    },
     "2026-10-20": {
       "status": "ausverkauft",
       "termine": {
