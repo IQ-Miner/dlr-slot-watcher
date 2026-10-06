@@ -16,7 +16,7 @@
     },
     "953b11ef0dce1a9079e1e93896d15578": {
       "button": "Ausverkauft",
-      "naechster_termin": "2026-10-20T08:00:00+02:00",
+      "naechster_termin": "2026-10-27T08:00:00+01:00",
       "ort": "Sportallee 54A, 22335 Hamburg, Deutschland",
       "status": "ausverkauft",
       "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
@@ -30,17 +30,6 @@
     }
   },
   "tage": {
-    "2026-10-20": {
-      "status": "ausverkauft",
-      "termine": {
-        "953b11ef0dce1a9079e1e93896d15578-2026-10-20-08-00-00": {
-          "angebot": "953b11ef0dce1a9079e1e93896d15578",
-          "start": "2026-10-20T08:00:00+02:00",
-          "status": "ausverkauft",
-          "titel": "Termine DLR Zertifikat in Hamburg (Testsprache nur deutsch)"
-        }
-      }
-    },
     "2026-10-27": {
       "status": "ausverkauft",
       "termine": {
