@@ -2,7 +2,7 @@
   "angebote": {
     "31e09ad84f2ba0f4a931847f15235d44": {
       "button": "Ausverkauft",
-      "naechster_termin": "2026-11-05T08:00:00+01:00",
+      "naechster_termin": "2026-12-10T08:00:00+01:00",
       "ort": "Sportallee 54A, 22335 Hamburg, Deutschland",
       "status": "ausverkauft",
       "titel": "Appointments for the DLR certificate in Hamburg (german & english)"
@@ -30,17 +30,6 @@
     }
   },
   "tage": {
-    "2026-11-05": {
-      "status": "ausverkauft",
-      "termine": {
-        "31e09ad84f2ba0f4a931847f15235d44-2026-11-05-08-00-00": {
-          "angebot": "31e09ad84f2ba0f4a931847f15235d44",
-          "start": "2026-11-05T08:00:00+01:00",
-          "status": "ausverkauft",
-          "titel": "Appointments for the DLR certificate in Hamburg (german & english)"
-        }
-      }
-    },
     "2026-11-06": {
       "status": "ausverkauft",
       "termine": {
